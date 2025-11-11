@@ -30,6 +30,10 @@ app.use('/categories', categoryRoutes);
 import orderRoutes from './routes/orders.js';
 app.use('/orders', orderRoutes);
 
+import inventoryRoutes from './routes/inventories.js';
+app.use('/inventories', inventoryRoutes);
+
+
 
 // Test route
 app.get('/', (req, res) => {
