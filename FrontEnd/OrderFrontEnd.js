@@ -1,11 +1,10 @@
 const container = document.getElementById('ordersContainer');
 
-/* ---------------------- Create New Order Form ---------------------- */
+// CREATE NEW ORDER FORM
 const form = document.createElement('div');
 form.style.marginTop = '20px';
 form.innerHTML = `
   <h3>Create New Order</h3>
-
   <select id="newOrderUser" style="margin:5px;"></select>
   <select id="newOrderProduct" style="margin:5px;"></select>
   <input type="number" placeholder="Quantity" id="newOrderQty" style="margin:5px;" min="1">
@@ -13,11 +12,12 @@ form.innerHTML = `
 `;
 container.appendChild(form);
 
-let currentProducts = []; // store products to know stock
+// STORE PRODUCTS FOR STOCK CHECK
+let currentProducts = [];
 
-/* ---------------------- Load Users & Products ---------------------- */
+// LOAD USERS & PRODUCTS
 async function loadDropdowns() {
-  // Users
+  // Load users
   const usersRes = await fetch('/users');
   const users = await usersRes.json();
   const userSelect = document.getElementById('newOrderUser');
@@ -29,10 +29,10 @@ async function loadDropdowns() {
     userSelect.appendChild(opt);
   });
 
-  // Products
+  // Load products
   const productsRes = await fetch('/products');
   const products = await productsRes.json();
-  currentProducts = products; // save for stock check
+  currentProducts = products; // save for stock validation
   const prodSelect = document.getElementById('newOrderProduct');
   prodSelect.innerHTML = '<option disabled selected>Select Product</option>';
   products.forEach(p => {
@@ -43,7 +43,7 @@ async function loadDropdowns() {
   });
 }
 
-/* ---------------------- Quantity Check ---------------------- */
+// QUANTITY INPUT CHECK
 const qtyInput = document.getElementById('newOrderQty');
 const prodSelect = document.getElementById('newOrderProduct');
 
@@ -62,7 +62,7 @@ qtyInput.addEventListener('input', () => {
   }
 });
 
-/* ---------------------- Create Order ---------------------- */
+// CREATE ORDER BUTTON
 document.getElementById('createOrderBtn').addEventListener('click', async () => {
   const userId = document.getElementById('newOrderUser').value;
   const productId = document.getElementById('newOrderProduct').value;
@@ -88,12 +88,15 @@ document.getElementById('createOrderBtn').addEventListener('click', async () => 
   });
 });
 
-/* ---------------------- Load Orders ---------------------- */
+// LOAD ORDERS
 function loadOrders() {
   fetch('/orders')
     .then(res => res.json())
     .then(orders => {
-      container.querySelectorAll('select.orderSelect, div.orderDetails, button.deleteBtn').forEach(el => el.remove());
+
+      // Remove previous elements
+      container.querySelectorAll('select.orderSelect, div.orderDetails, button.deleteBtn')
+        .forEach(el => el.remove());
 
       // Dropdown
       const select = document.createElement('select');
@@ -112,7 +115,7 @@ function loadOrders() {
       });
       container.insertBefore(select, form);
 
-      // Details
+      // Order details
       const orderDetails = document.createElement('div');
       orderDetails.classList.add('orderDetails');
       orderDetails.style.marginTop = '10px';
@@ -120,22 +123,22 @@ function loadOrders() {
 
       select.addEventListener('change', () => {
         const o = orders.find(x => x._id === select.value);
-        if (o) {
-          const productsList = o.products
-            .map(p => `${p.product?.name || p.product} (x${p.quantity})`)
-            .join(', ');
+        if (!o) return;
 
-          orderDetails.innerHTML = `
-            <p><strong>ID:</strong> ${o._id}</p>
-            <p><strong>User:</strong> ${o.user?.name || o.user}</p>
-            <p><strong>Products:</strong> ${productsList}</p>
-            <p><strong>Total Price:</strong> $${o.totalPrice}</p>
-            <p><strong>Status:</strong> ${o.status}</p>
-          `;
-        }
+        const productsList = o.products
+          .map(p => `${p.product?.name || p.product} (x${p.quantity})`)
+          .join(', ');
+
+        orderDetails.innerHTML = `
+          <p><strong>ID:</strong> ${o._id}</p>
+          <p><strong>User:</strong> ${o.user?.name || o.user}</p>
+          <p><strong>Products:</strong> ${productsList}</p>
+          <p><strong>Total Price:</strong> $${o.totalPrice}</p>
+          <p><strong>Status:</strong> ${o.status}</p>
+        `;
       });
 
-      // Delete Button
+      // Delete button
       const deleteBtn = document.createElement('button');
       deleteBtn.textContent = "Delete Selected Order";
       deleteBtn.classList.add('deleteBtn');
@@ -148,7 +151,7 @@ function loadOrders() {
     });
 }
 
-/* ---------------------- Delete Order ---------------------- */
+// DELETE ORDER
 function deleteOrder(id) {
   fetch(`/orders/${id}`, { method: 'DELETE' })
     .then(res => res.json())
@@ -156,7 +159,7 @@ function deleteOrder(id) {
     .catch(err => console.error(err));
 }
 
-/* ---------------------- Add Order ---------------------- */
+// ADD ORDER
 function addOrder(orderData) {
   fetch('/orders', {
     method: 'POST',
@@ -172,6 +175,6 @@ function addOrder(orderData) {
     .catch(err => console.error(err));
 }
 
-/* ---------------------- Initial Load ---------------------- */
+// INITIAL LOAD
 loadDropdowns();
 loadOrders();

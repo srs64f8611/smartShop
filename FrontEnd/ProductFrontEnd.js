@@ -1,10 +1,6 @@
-/* ---------------------------
-   PRODUCTS SECTION
----------------------------- */
-
 const productsContainer = document.getElementById('productsContainer');
 
-// --- Create Product Form ---
+// CREATE PRODUCT FORM
 const productForm = document.createElement('div');
 productForm.style.marginTop = '20px';
 productForm.innerHTML = `
@@ -18,7 +14,7 @@ productForm.innerHTML = `
 `;
 productsContainer.appendChild(productForm);
 
-// Load categories into dropdown
+// LOAD CATEGORIES INTO DROPDOWN
 function loadProductCategoryOptions() {
   fetch('/categories')
     .then(res => res.json())
@@ -35,6 +31,7 @@ function loadProductCategoryOptions() {
     });
 }
 
+// CREATE PRODUCT BUTTON
 document.getElementById('createProductBtn').addEventListener('click', () => {
   const data = {
     name: document.getElementById('newProdName').value.trim(),
@@ -51,15 +48,16 @@ document.getElementById('createProductBtn').addEventListener('click', () => {
   addProduct(data);
 });
 
-// --- Load Products ---
+// LOAD PRODUCTS
 function loadProducts() {
   fetch('/products')
     .then(res => res.json())
     .then(products => {
+      // Remove old UI
       productsContainer.querySelectorAll('.prodSelect, .prodDetails, .prodDeleteBtn')
         .forEach(el => el.remove());
 
-      // Dropdown
+      // PRODUCT DROPDOWN
       const select = document.createElement('select');
       select.classList.add('prodSelect');
 
@@ -78,7 +76,7 @@ function loadProducts() {
 
       productsContainer.insertBefore(select, productForm);
 
-      // Details box
+      // PRODUCT DETAILS BOX
       const details = document.createElement('div');
       details.classList.add('prodDetails');
       details.style.marginTop = '10px';
@@ -96,11 +94,12 @@ function loadProducts() {
         `;
       });
 
-      // Delete button
+      // DELETE BUTTON
       const deleteBtn = document.createElement('button');
       deleteBtn.textContent = 'Delete Selected Product';
       deleteBtn.classList.add('prodDeleteBtn');
       deleteBtn.style.marginLeft = '10px';
+
       deleteBtn.addEventListener('click', () => {
         if (select.value) deleteProduct(select.value);
       });
@@ -109,7 +108,7 @@ function loadProducts() {
     });
 }
 
-// --- Add Product ---
+// ADD PRODUCT
 function addProduct(data) {
   fetch('/products')
     .then(res => res.json())
@@ -134,13 +133,13 @@ function addProduct(data) {
     });
 }
 
-// --- Delete Product ---
+// DELETE PRODUCT
 function deleteProduct(id) {
   fetch(`/products/${id}`, { method: 'DELETE' })
     .then(res => res.json())
     .then(() => loadProducts());
 }
 
-/* Run at startup */
+// INITIAL LOAD
 loadProductCategoryOptions();
 loadProducts();
