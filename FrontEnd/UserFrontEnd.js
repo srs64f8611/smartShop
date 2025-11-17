@@ -30,7 +30,10 @@ document.getElementById('createUserBtn').addEventListener('click', () => {
   if (!name || !email || !password || !role) {
     return alert('Please fill all fields');
   }
-
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) {
+    return alert("Please enter a valid email address!");
+  }
   addUser({ name, email, password, role });
 });
 
